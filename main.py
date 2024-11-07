@@ -1,10 +1,12 @@
+import smtplib
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
+from pyexpat.errors import messages
 from wtforms.fields.numeric import FloatField, IntegerField
-from wtforms.validators import DataRequired, NumberRange
-from wtforms.fields.simple import SubmitField, StringField, URLField
+from wtforms.validators import DataRequired, NumberRange, email
+from wtforms.fields.simple import SubmitField, StringField, URLField, EmailField
 import requests
 from datetime import datetime
 from sqlalchemy import desc
@@ -43,10 +45,11 @@ class Movie(db.Model):
         return self.title
         # return f"<Movie (title='{self.title}', year={self.year}, description='{self.description}', rating={self.rating}, img_url='{self.img_url}')>"
 
-# class AddForm(FlaskForm):
-#     ranking = IntegerField('Ranking', validators=[DataRequired()])
-#     review = StringField('Review', validators=[DataRequired()])
-#     submit = SubmitField('Save Changes')
+class AboutForm(FlaskForm):
+    name = StringField('Name:', validators=[DataRequired()])
+    message = StringField('Message:', validators=[DataRequired()])
+    email = EmailField('E-Mail:', validators=[DataRequired()])
+    submit = SubmitField('SEND')
 
 class AddMovie(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
@@ -65,13 +68,35 @@ def home():
                                   Movie.vote, Movie.img_url).order_by(desc(Movie.ranking)).all()
     return render_template("index.html", all_movies=all_movies)
 
-@app.route("/about")
+@app.route("/about", methods=['GET', 'POST'])
 def about():
-    return render_template("about.html")
+    aboutform = AboutForm()
+    if aboutform.validate_on_submit():
+        name = aboutform.name.data
+        email = aboutform.email.data
+        message = aboutform.message.data
+        my_email = "drkuntakinte2000@gmail.com"
+        password = "spud szmr gnyf otsy"
+        mails = ["jmmapunda@gmail.com", ]
+        for mail in mails:
+            with smtplib.SMTP("smtp.gmail.com") as connection:
+                connection.starttls()
+                connection.login(user=my_email, password=password)
+                connection.sendmail(
+                    from_addr=my_email,
+                    to_addrs=mail,
+                    msg=f"Subject:{email} Motivation\n\nHello i am {name} \nMessage:{message}\n{email}."
+                    )
+        print(name)
+
+
+    return render_template("about.html", aboutform=aboutform)
 
 @app.route("/allmovie")
 def allmovie():
-    return render_template("allmovie.html")
+    all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
+                                  Movie.vote, Movie.img_url).order_by(desc(Movie.rating)).all()
+    return render_template("allmovie.html", all_movies=all_movies)
 
 
 # @app.route("/edit/<int:movie_id>", methods=['GET', 'POST'])
@@ -85,7 +110,7 @@ def allmovie():
 #         return redirect(url_for('home'))
 #     return render_template("edit.html", edit_form=edit_form, movie=movie)
 
-#TODO put a vote link and delete to the movie posters back side
+#TODO put a delete link to the movie posters back side
 @app.route("/delete/<int:movie_id>",)
 def delete(movie_id):
     movie_to_delete = Movie.query.get(movie_id)
@@ -100,7 +125,6 @@ def vote(movie_id):
     movie_to_vote = Movie.query.get(movie_id)
     if movie_to_vote:
         movie_to_vote.ranking += 1
-        # db.session.delete(movie_to_vote)
         db.session.commit()
 
     return redirect(url_for('home'))
@@ -154,8 +178,8 @@ def add():
                 # Add a new book record
                 # new_movie = Movie(title=add_form.title.data, year=add_form.year.data, description=add_form.description.data, rating=add_form.rating.data, ranking=add_form.ranking.data, review=add_form.review.data, img_url=add_form.img_url.data)
                 new_movie = f"{Movie(title=add_form.title.data)}".replace(' ', '+')
-
-                # all of the movie code selection should be here to show results in <p> in add.html and be be able to select result to save
+                print(new_movie)
+                # all of the movie code selection should be here to show results in <p> in add.html and be able to select result to save
 
                 tmdb_url = f'https://api.themoviedb.org/3/search/movie?query={new_movie}&api_key={APIKEY}'
                 image_poster = f'https://image.tmdb.org/t/p/original/{"#"}'
