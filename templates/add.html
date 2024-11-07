@@ -1,0 +1,27 @@
+{% include 'headers.html' %}
+
+<div class="content">
+    <h1 class="heading">Add a Movie</h1>
+    <form action="{{ url_for('add') }}" method="post">
+        <label>Movie Title</label>
+        {{ form.title }}
+
+        <br>
+
+
+        {{ form.submit }}
+        {{ form.csrf_token }}
+    </form>
+    <br>
+
+</div>
+<p>
+      <ul>
+        {% for movie in movie_results: %}
+        <li><a href="{{ url_for('selected_movie', id_movie=movie.id) }}">{{ movie.movie_title }} - Release date: {{movie.movie_release_date}}</a></li>
+        <br>
+        {% endfor %}
+    </ul>
+    </p>
+
+{% include 'footer.html' %}

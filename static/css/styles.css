@@ -1,0 +1,136 @@
+body{
+    padding-left: 3em;
+    background: #243642;
+}
+.nav{
+    padding: .5em;
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 600;
+}
+.movieposter{
+    float: right;
+    align-items: right;
+    position: relative;
+    height: 375px;
+    width: 250px;
+    min-width: 190px;
+    min-height: 270px;
+    font-size: small;
+    display: flow-root; 
+}
+::-webkit-scrollbar{
+    display: none;
+}
+.movieranking{
+    float: left;
+    font-size: 100px;
+    height: 340px;
+    width: .1em;
+    /* border: solid blue; */
+    padding-top: 2.5em;
+    text-align: left;
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 700;
+    
+}
+.rankingposter{
+    padding-top: 1.9em;
+    padding-bottom: 1em;
+    /* background-color: aquamarine; */
+    /* display: flex; */
+    /* overflow: auto; */
+    height: 450px;
+    width: 300px;
+    /* padding-left: 50px; */
+    border-right: .4em solid transparent;
+    box-sizing: border-box;
+    min-width: 300px;
+    /* border: solid; */
+    overflow-x: hidden;
+}
+.topmovie{
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    width: 100%;
+    background-color: #1A1A1D;
+}
+.flip-card {
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    perspective: 1000px; /* Creates 3D effect */
+}
+
+.flip-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+    transform: rotateY(180deg); /* Triggers the flip on hover */
+}
+
+.flip-card-front, .flip-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden; /* Hides the back side when not flipped */
+    border-radius: 10px;
+}
+
+.flip-card-front {
+    background-color: aqua; /* Change this as needed */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.flip-card-back {
+    background-color: #FBFBFB; /* Change this as needed */
+    color: black;
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    font-weight: bold;
+}
+.movietitle{
+    font-size: 16px;
+    text-align: center;
+    width: 100%;
+    white-space: normal;
+}
+.movierating{
+    color: goldenrod;
+}
+p{
+    font-size: small;
+    width: 100%;
+    /* height: 500px; */
+    overflow: scroll; /* Hides overflowing text */
+    text-overflow: ellipsis; /* Adds '...' to overflowing text */
+    white-space: normal; /* Prevents text from wrapping */
+    font-size: 13px;
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 400;
+}
+p::-webkit-scrollbar {
+    display: none;
+}
+.titletext{
+    font-family: "PT Serif";
+    font-style: normal;
+    font-weight: 700;
+    margin: .7em 0;
+}
