@@ -11,15 +11,16 @@ import requests
 from datetime import datetime
 from sqlalchemy import desc
 
-APIKEY = 'b9a47fe57ebbebfa92c6ca9a7eaf11c8'
-APITOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiOWE0N2ZlNTdlYmJlYmZhOTJjNmNhOWE3ZWFmMTFjOCIsIm5iZiI6MTczMDQ4NzU1Ni43MDc1NzE3LCJzdWIiOiI2NzI0ZjI1Mjc3MWY1Y2IxNDk1NTgxODkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.pjy1yf6xmkLJ7hEQwMfq4lDHndgF-nZhRB2G7y-azes'
+
+APIKEY = 'john'
+APITOKEN = 'john'
 # tmdb_url = f'https://api.themoviedb.org/3/search/movie?query=venom&api_key={APIKEY}'
 image_poster = 'https:///image.tmdb.org/t/p/original/'
 
 # print(requests.get(tmdb_url).json())
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = 'non'
 Bootstrap(app)
 
 ##CREATE DATABASE
@@ -78,9 +79,9 @@ def about():
         name = aboutform.name.data
         email = aboutform.email.data
         message = aboutform.message.data
-        my_email = "drkuntakinte2000@gmail.com"
-        password = "spud szmr gnyf otsy"
-        mails = ["jmmapunda@gmail.com", ]
+        my_email = "john"
+        password = "john"
+        mails = ["john", ]
         for mail in mails:
             with smtplib.SMTP("smtp.gmail.com") as connection:
                 connection.starttls()
