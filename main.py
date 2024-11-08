@@ -5,8 +5,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_wtf import FlaskForm
 from pyexpat.errors import messages
 from wtforms.fields.numeric import FloatField, IntegerField
-from wtforms.validators import DataRequired, NumberRange, email
-from wtforms.fields.simple import SubmitField, StringField, URLField, EmailField
+from wtforms.validators import DataRequired, Email
+from wtforms.fields.simple import SubmitField, StringField, EmailField
 import requests
 from datetime import datetime
 from sqlalchemy import desc
@@ -48,7 +48,7 @@ class Movie(db.Model):
 class AboutForm(FlaskForm):
     name = StringField('Name:', validators=[DataRequired()])
     message = StringField('Message:', validators=[DataRequired()])
-    email = EmailField('E-Mail:', validators=[DataRequired()])
+    email = EmailField('E-Mail:', validators=[DataRequired(), Email()])
     submit = SubmitField('SEND')
 
 class AddMovie(FlaskForm):
@@ -68,8 +68,11 @@ def home():
                                   Movie.vote, Movie.img_url).order_by(desc(Movie.ranking)).all()
     return render_template("index.html", all_movies=all_movies)
 
+
 @app.route("/about", methods=['GET', 'POST'])
 def about():
+    all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
+                                  Movie.vote, Movie.img_url).order_by(desc(Movie.rating)).all()
     aboutform = AboutForm()
     if aboutform.validate_on_submit():
         name = aboutform.name.data
@@ -85,12 +88,10 @@ def about():
                 connection.sendmail(
                     from_addr=my_email,
                     to_addrs=mail,
-                    msg=f"Subject:{email} Motivation\n\nHello i am {name} \nMessage:{message}\n{email}."
+                    msg=f"Subject:{email}\n\nHello i am {name} \nMessage:{message}\n{email}."
                     )
-        print(name)
 
-
-    return render_template("about.html", aboutform=aboutform)
+    return render_template("about.html", aboutform=aboutform, all_movies=all_movies)
 
 @app.route("/allmovie")
 def allmovie():
@@ -151,10 +152,10 @@ def selected_movie(id_movie):
                         )
                     db.session.add(movie_added)
                     db.session.commit()
-                    print(f' movie added is: {movie_added}')
+                    # print(f' movie added is: {movie_added}')
                 except Exception as e:
                     db.session.rollback()  # Roll back if there's any error
-                    print("Failed 1 to add the movie:", e)
+                    # print("Failed 1 to add the movie:", e)
 
 
             # print(f' movie added is: {movie_added}')
@@ -165,53 +166,30 @@ def selected_movie(id_movie):
 def add():
     add_form = AddMovie()
     movie_results.clear()
-    # movie_results = []
-
     if add_form.validate_on_submit():
-        print("added")
-        with app.app_context():
-            try:
+        # Add a new book record
+        # new_movie = Movie(title=add_form.title.data, year=add_form.year.data, description=add_form.description.data, rating=add_form.rating.data, ranking=add_form.ranking.data, review=add_form.review.data, img_url=add_form.img_url.data)
+        new_movie = f"{add_form.title.data}".replace(' ', '+')
+        print(new_movie)
+        # all of the movie code selection should be here to show results in <p> in add.html and be able to select result to save
 
-                db.create_all()  # Create tables
-                print("Database and table creation successful.")
+        tmdb_url = f'https://api.themoviedb.org/3/search/movie?query={new_movie}&api_key={APIKEY}'
+        # image_poster = f'https://image.tmdb.org/t/p/original/{"#"}'
+        results = [requests.get(tmdb_url).json()]
+        data = results[0]['results']
+        print(len(data))
+        for n in range(0, len(data)):
+            movie_title = data[n]['original_title']
+            movie_release_date = data[n]['release_date']
+            movie_description = data[n]['overview']
+            movie_rating = data[n]['vote_average']
+            movie_img_url = data[n]['poster_path']
+            id_movie = data[n]['id']
+            movie_data = {'id' : id_movie, 'movie_title' : movie_title, 'movie_release_date' : movie_release_date, 'movie_description' : movie_description, 'movie_rating' : movie_rating, 'movie_img_url' : movie_img_url}
+            movie_results.append(movie_data)
+            # movie_results.append(f'{movie_title} - {movie_release_date}')
+            print(movie_results)
 
-                # Add a new book record
-                # new_movie = Movie(title=add_form.title.data, year=add_form.year.data, description=add_form.description.data, rating=add_form.rating.data, ranking=add_form.ranking.data, review=add_form.review.data, img_url=add_form.img_url.data)
-                new_movie = f"{Movie(title=add_form.title.data)}".replace(' ', '+')
-                print(new_movie)
-                # all of the movie code selection should be here to show results in <p> in add.html and be able to select result to save
-
-                tmdb_url = f'https://api.themoviedb.org/3/search/movie?query={new_movie}&api_key={APIKEY}'
-                image_poster = f'https://image.tmdb.org/t/p/original/{"#"}'
-                results = [requests.get(tmdb_url).json()]
-                data = results[0]['results']
-                print(len(data))
-                for n in range(0, len(data)):
-                    movie_title = data[n]['original_title']
-                    movie_release_date = data[n]['release_date']
-                    movie_description = data[n]['overview']
-                    movie_rating = data[n]['vote_average']
-                    movie_img_url = data[n]['poster_path']
-                    id_movie = data[n]['id']
-                    movie_data = {'id' : id_movie, 'movie_title' : movie_title, 'movie_release_date' : movie_release_date, 'movie_description' : movie_description, 'movie_rating' : movie_rating, 'movie_img_url' : movie_img_url}
-                    movie_results.append(movie_data)
-                    # movie_results.append(f'{movie_title} - {movie_release_date}')
-                    # print(movie_results)
-
-
-
-                # db.session.add(new_movie)
-                # db.session.commit()
-
-                all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking, Movie.review, Movie.img_url).all()
-                print(new_movie)
-
-
-            except Exception as e:
-                db.session.rollback()  # Roll back if there's any error
-                print("Failed to add the movie:", e)
-
-    print(movie_results)
     return render_template("add.html", form=add_form, movie_results=movie_results)
 
 # with app.app_context():

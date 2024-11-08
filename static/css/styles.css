@@ -1,6 +1,11 @@
 body{
+    font-family: "PT Serif";
     padding-left: 3em;
-    background: #243642;
+    background: #1A1A1D;
+    color: #FBFBFB;
+    height: 100vh;
+    padding-bottom: 50px;
+    box-sizing: border-box;
 }
 .nav{
     padding: .5em;
@@ -33,6 +38,7 @@ body{
     font-family: "PT Serif";
     font-style: normal;
     font-weight: 700;
+    color: #393646;
     
 }
 .rankingposter{
@@ -120,7 +126,7 @@ p{
     overflow: scroll; /* Hides overflowing text */
     text-overflow: ellipsis; /* Adds '...' to overflowing text */
     white-space: normal; /* Prevents text from wrapping */
-    font-size: 13px;
+    font-size: 16px;
     font-family: "PT Serif";
     font-style: normal;
     font-weight: 400;
@@ -133,4 +139,32 @@ p::-webkit-scrollbar {
     font-style: normal;
     font-weight: 700;
     margin: .7em 0;
+}
+.searchtitle {
+    display: block;            /* Makes the link behave like a block element */
+    width: 150px;              /* Set the width limit */
+    text-align: justify;       /* Justify the text */
+    white-space: nowrap;       /* Prevents text from wrapping to a new line */
+    overflow: hidden;          /* Hides overflow text */
+    text-overflow: ellipsis;   /* Adds "..." for overflowing text */
+}
+footer{
+height: 50px;
+background-color: #393646;
+color: #FBFBFB;
+text-align: center;
+padding: 10px;
+/* position: fixed; */
+bottom: 0;
+width: 100%;
+margin: 0em 3em 0 0;
+}
+.nav-link:hover{
+color: #FBFBFB;
+}
+.nav-link{
+    color: #FBFBFB;
+    }
+h1{
+   font-style: italic;
 }

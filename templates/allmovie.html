@@ -1,32 +1,37 @@
 {% include 'headers.html' %}
 
         <h2 class="titletext">All Movies</h2>
-        <div class="topmovie">
-            {% for movie in all_movies[:100] %}
-          <div class="rankingposter" id="rankingposter2">
-              <div class="movieranking">{{ loop.index }}</div> <!-- ranking here -->
-              <div class="movieposter">
-                <div class="flip-card">
+        <div class="container topmovie">
+          <div class="row justify-content-center">
+            {% for movie in all_movies %}
+              <div class="col-6 col-md-6 col-lg-2 mb-4 rankingposter" id="rankingposter2">
+                <div class="movieranking">{{ loop.index }}</div> <!-- ranking here -->
+                <div class="movieposter">
+                  <div class="flip-card">
                     <div class="flip-card-inner">
-                        <div class="flip-card-front">
-                            <img src="{{ movie.img_url }}" alt="Movie Poster" style="width:100%;height:100%;">
+                      <div class="flip-card-front">
+                        <img src="{{ movie.img_url }}" alt="Movie Poster" class="img-fluid" style="width:100%; height:100%;">
+                      </div>
+                      <div class="flip-card-back">
+                        <div class="movietitle">
+                          {{ movie.title }} <span>({{ movie.year }})</span>
+                          <div class="movierating">
+                            {{ movie.rating }} 
+                            <img src="/static/assets/img/star_icon.png" alt="Star Icon" style="width: 16px;">
+                          </div>
                         </div>
-                        <div class="flip-card-back">
-                          <div class="movietitle">{{ movie.title }}
-                            <span>({{ movie.year }})</span>
-                          <div class="movierating">{{ movie.rating }} <img src="/static/assets/img/star_icon.png"
-                                                                                 alt="Star Icon" style="width: 16px;">
-                                </div>
-                          </div>Description:
-                            <p>{{ movie.description }}</p>
-                            <button type="button" class="btn btn-outline-success"><a
-                                    href="{{ url_for('vote', movie_id=movie.id) }}">Vote</a></button>Votes: {{ movie.ranking }}
-                        </div>
+                        <p><strong>Description:</strong> {{ movie.description }}</p>
+                        <button type="button" class="btn btn-outline-success">
+                          <a href="{{ url_for('vote', movie_id=movie.id) }}" style="text-decoration: none; color: inherit;">Vote</a>
+                        </button>
+                        <span>Votes: {{ movie.ranking }}</span>
+                      </div>
                     </div>
+                  </div>
                 </div>
-            </div>
-          </div>
+              </div>
             {% endfor %}
-      </div>
+          </div>
+        </div>
 
 {% include 'footer.html' %}

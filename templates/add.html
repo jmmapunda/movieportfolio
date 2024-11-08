@@ -6,22 +6,35 @@
         <label>Movie Title</label>
         {{ form.title }}
 
-        <br>
 
 
-        {{ form.submit }}
-        {{ form.csrf_token }}
+        <div class="d-flex mb-3 content-end">
+          {{ form.submit(class="btn btn-outline-success btn-md") }}
+        </div>
+              {{ form.csrf_token }}
     </form>
     <br>
 
 </div>
-<p>
-      <ul>
-        {% for movie in movie_results: %}
-        <li><a href="{{ url_for('selected_movie', id_movie=movie.id) }}">{{ movie.movie_title }} - Release date: {{movie.movie_release_date}}</a></li>
-        <br>
-        {% endfor %}
-    </ul>
-    </p>
+
+<div class="container text-center">
+  <div class="row justify-content-md">
+    {% for movie in movie_results: %}
+    <div class="col-md-auto">
+      <div>
+        <div><a href="{{ url_for('selected_movie', id_movie=movie.id) }}" class="searchtitle">{{ movie.movie_title }} - {{movie.movie_release_date}}</a></div>
+        <div><img src="https://image.tmdb.org/t/p/original{{ movie.movie_img_url }}" class="img-thumbnail" alt="{{ movie.movie_title }}" style="width:150px;height:220px;"></div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+
+
+
+
 
 {% include 'footer.html' %}

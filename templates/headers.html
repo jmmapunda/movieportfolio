@@ -11,16 +11,19 @@
     <link href="https://fonts.googleapis.com/css2?family=PT+Serif:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
   </head>
     <header>
-        <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" aria-current="page" href="{{ url_for('home') }}">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('allmovie') }}">All Movies</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('about') }}">About</a>
-            </li>
-          </ul>
+
+      <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link {% if request.path == url_for('home') %}active{% endif %}" href="{{ url_for('home') }}">Home</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.path == url_for('allmovie') %}active{% endif %}" href="{{ url_for('allmovie') }}">All Movies</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link {% if request.path == url_for('about') %}active{% endif %}" href="{{ url_for('about') }}">About</a>
+        </li><li class="nav-item">
+          <a class="nav-link {% if request.path == url_for('add') %}active{% endif %}" href="{{ url_for('add') }}">Add Movie</a>
+      </li>
+    </ul>
     </header>
-  </html>
+  

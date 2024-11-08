@@ -3,18 +3,64 @@
 
 
 <body>
-    <div class="about">
-        <div class="about">John</div>
-        <div class="form">
-            <form action="{{ url_for('about') }}" method="post">
-                {{ aboutform.name }}
-                {{ aboutform.email }}
-                {{ aboutform.message }}
-                {{ aboutform.submit }}
-                {{ aboutform.csrf_token }}
-            </form>
+
+  <div class="container">
+    <div class="row">
+      <!-- About content on the left side -->
+      <div class="col-md-6">
+        <div class="aboutcover">
+          <h1>About</h1>
+          <br>
+              
+                <h2>About This Project</h2>
+                <p>This web application, developed using Flask, combines dynamic backend functionality with a clean, responsive frontend. Flask powers the routing, API integrations, and data handling, using Jinja2 for dynamic HTML rendering. Locally, it relies on SQLite for data management, with a transition to Supabase for the production database, enhancing scalability and performance.</p>
+
+<p>On the frontend, HTML, CSS, and Bootstrap create a smooth, responsive design that adjusts across devices, while JavaScript adds interactivity to features like movie rankings and voting. Version control is maintained through GitHub, and the application is deployed on Render, ensuring reliability and scalability.</p>
+
+<h2>About Me</h2>
+
+<p>As a web developer with experience in Python, full-stack development, and database management, I’m committed to building efficient, user-centered applications. This project reflects my dedication to delivering high-quality solutions that balance functionality and user experience.</p>
+
         </div>
+      </div>
+  
+      <!-- Form on the right side -->
+      <div class="col-md-6">
+        <form method="POST" action="{{ url_for('about') }}">
+          {{ aboutform.csrf_token }}
+          
+          <!-- Row for name and email fields side-by-side -->
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                {{ aboutform.name(class="form-control form-control-sm text-muted") }}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                {{ aboutform.email(class="form-control form-control-sm text-muted") }}
+              </div>
+            </div>
+          </div>
+  
+          <!-- Message field below -->
+          <div class="mb-3">
+            <label for="message" class="form-label">Message</label>
+            {{ aboutform.message(class="form-control") }}
+          </div>
+  
+          <!-- Submit button -->
+          <div class="d-flex mb-3 justify-content-end">
+            {{ aboutform.submit(class="btn btn-outline-success btn-md w-100") }}
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
+  
+
 </body>
 
 {% include "footer.html" %}
