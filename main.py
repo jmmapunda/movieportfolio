@@ -1,3 +1,4 @@
+import os
 import smtplib
 from flask import Flask, render_template, redirect, url_for, request
 from flask_bootstrap import Bootstrap
@@ -10,17 +11,18 @@ from wtforms.fields.simple import SubmitField, StringField, EmailField
 import requests
 from datetime import datetime
 from sqlalchemy import desc
+from dotenv import load_dotenv
 
-
-APIKEY = 'b9a47fe57ebbebfa92c6ca9a7eaf11c8'
-APITOKEN = 'eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiOWE0N2ZlNTdlYmJlYmZhOTJjNmNhOWE3ZWFmMTFjOCIsIm5iZiI6MTczMDQ4NzU1Ni43MDc1NzE3LCJzdWIiOiI2NzI0ZjI1Mjc3MWY1Y2IxNDk1NTgxODkiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.pjy1yf6xmkLJ7hEQwMfq4lDHndgF-nZhRB2G7y-azes'
+load_dotenv()
+APIKEY = os.getenv('APIKEY')
+APITOKEN = os.getenv('APITOKEN')
 # tmdb_url = f'https://api.themoviedb.org/3/search/movie?query=venom&api_key={APIKEY}'
 image_poster = 'https:///image.tmdb.org/t/p/original/'
 
 # print(requests.get(tmdb_url).json())
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+app.config['SECRET_KEY'] = os.getenv('app')
 Bootstrap(app)
 
 ##CREATE DATABASE
@@ -79,9 +81,9 @@ def about():
         name = aboutform.name.data
         email = aboutform.email.data
         message = aboutform.message.data
-        my_email = "drkuntakinte2000@gmail.com"
-        password = "spud szmr gnyf otsy"
-        mails = ["jmmapunda@gmail.com", ]
+        my_email = os.getenv('my_email')
+        password = os.getenv('password')
+        mails = os.getenv('mails')
         for mail in mails:
             with smtplib.SMTP("smtp.gmail.com") as connection:
                 connection.starttls()
@@ -112,7 +114,7 @@ def allmovie():
 #         return redirect(url_for('home'))
 #     return render_template("edit.html", edit_form=edit_form, movie=movie)
 
-#TODO put a delete link to the movie posters back side
+
 @app.route("/delete/<int:movie_id>",)
 def delete(movie_id):
     movie_to_delete = Movie.query.get(movie_id)
@@ -171,14 +173,14 @@ def add():
         # Add a new book record
         # new_movie = Movie(title=add_form.title.data, year=add_form.year.data, description=add_form.description.data, rating=add_form.rating.data, ranking=add_form.ranking.data, review=add_form.review.data, img_url=add_form.img_url.data)
         new_movie = f"{add_form.title.data}".replace(' ', '+')
-        print(new_movie)
+        # print(new_movie)
         # all of the movie code selection should be here to show results in <p> in add.html and be able to select result to save
 
         tmdb_url = f'https://api.themoviedb.org/3/search/movie?query={new_movie}&api_key={APIKEY}'
         # image_poster = f'https://image.tmdb.org/t/p/original/{"#"}'
         results = [requests.get(tmdb_url).json()]
         data = results[0]['results']
-        print(len(data))
+
         for n in range(0, len(data)):
             movie_title = data[n]['original_title']
             movie_release_date = data[n]['release_date']
@@ -189,7 +191,7 @@ def add():
             movie_data = {'id' : id_movie, 'movie_title' : movie_title, 'movie_release_date' : movie_release_date, 'movie_description' : movie_description, 'movie_rating' : movie_rating, 'movie_img_url' : movie_img_url}
             movie_results.append(movie_data)
             # movie_results.append(f'{movie_title} - {movie_release_date}')
-            print(movie_results)
+
 
     return render_template("add.html", form=add_form, movie_results=movie_results)
 
