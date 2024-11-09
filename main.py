@@ -12,12 +12,21 @@ import requests
 from datetime import datetime
 from sqlalchemy import desc
 from dotenv import load_dotenv
+from supabase import create_client, Client
 
 load_dotenv()
 APIKEY = os.getenv('APIKEY')
 APITOKEN = os.getenv('APITOKEN')
 # tmdb_url = f'https://api.themoviedb.org/3/search/movie?query=venom&api_key={APIKEY}'
 image_poster = 'https:///image.tmdb.org/t/p/original/'
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+DBPASSW = os.getenv('DBPASSW')
+
+user=os.getenv('user')
+host='aws-0-us-east-1.pooler.supabase.com'
+port='6543'
+dbname='postgres'
 
 # print(requests.get(tmdb_url).json())
 
@@ -26,7 +35,8 @@ app.config['SECRET_KEY'] = os.getenv('app')
 Bootstrap(app)
 
 ##CREATE DATABASE
-app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///./movie-portfolio.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{user}:{DBPASSW}@{host}:{port}/{dbname}"
+# app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///./movie-portfolio.db"
 # Optional: But it will silence the deprecation warning in the console.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
@@ -34,14 +44,15 @@ db = SQLAlchemy(app)
 
 ##CREATE TABLE
 class Movie(db.Model):
+    # __tablename__ = 'movie'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(250), unique=True, nullable=False)
+    title = db.Column(db.String(9000), unique=True, nullable=False)
     year = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(250), unique=True, nullable=False)
+    description = db.Column(db.String(9000), unique=True, nullable=False)
     rating = db.Column(db.Float, nullable=False)
     ranking = db.Column(db.Integer, nullable=True)
     vote = db.Column(db.Integer, nullable=True)
-    img_url = db.Column(db.String(250), unique=True, nullable=False)
+    img_url = db.Column(db.String(9000), unique=True, nullable=False)
 
     # Optional: this will allow each book object to be identified by its title when printed.
     def __repr__(self):
@@ -155,10 +166,10 @@ def selected_movie(id_movie):
                         )
                     db.session.add(movie_added)
                     db.session.commit()
-                    # print(f' movie added is: {movie_added}')
+                    print(f' movie added is: {movie_added}')
                 except Exception as e:
                     db.session.rollback()  # Roll back if there's any error
-                    # print("Failed 1 to add the movie:", e)
+                    print("Failed 1 to add the movie:", e)
 
 
             # print(f' movie added is: {movie_added}')
