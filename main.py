@@ -14,6 +14,7 @@ from sqlalchemy import desc
 from dotenv import load_dotenv
 from supabase import create_client, Client
 
+
 load_dotenv()
 APIKEY = os.getenv('APIKEY')
 APITOKEN = os.getenv('APITOKEN')
