@@ -94,16 +94,19 @@ def about():
         message = aboutform.message.data
         my_email = os.getenv('my_email')
         password = os.getenv('password')
-        mails = os.getenv('mails')
-        for mail in mails:
-            with smtplib.SMTP("smtp.gmail.com") as connection:
-                connection.starttls()
-                connection.login(user=my_email, password=password)
-                connection.sendmail(
-                    from_addr=my_email,
-                    to_addrs=mail,
-                    msg=f"Subject:{email}\n\nHello i am {name} \nMessage:{message}\n{email}."
-                    )
+        mail = os.getenv('mails')
+
+        with smtplib.SMTP("smtp.gmail.com") as connection:
+            connection.starttls()
+            connection.login(user=my_email, password=password)
+            connection.sendmail(
+                from_addr=my_email,
+                to_addrs=mail,
+                msg=f"Subject:{email}\n\nHello i am {name} \nMessage:{message}\n{email}."
+                )
+
+        return redirect(url_for('home'))
+
 
     return render_template("about.html", aboutform=aboutform, all_movies=all_movies)
 
