@@ -69,22 +69,4 @@
 # # Close the browser
 # driver.quit()
 
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
 
-message = Mail(
-    from_email='drkuntakinte@zohomail.com',
-    to_emails='jmmapunda@yahoo.co.uk',
-    subject='Secure Email with SendGrid',
-    html_content='This is a secure message sent with SendGrid!')
-
-try:
-    sg = SendGridAPIClient('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')
-    response = sg.send(message)
-    print(response.status_code)
-    print(response.body)
-    print('good')
-    print(response.headers)
-except Exception as e:
-    print(e)
-    print('shida')
