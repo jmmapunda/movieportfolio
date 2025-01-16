@@ -108,7 +108,6 @@ def about():
 
         return redirect(url_for('home'))
 
-
     return render_template("about.html", aboutform=aboutform, all_movies=all_movies)
 
 @app.route("/allmovie")
