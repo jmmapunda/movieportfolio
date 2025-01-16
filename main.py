@@ -97,7 +97,7 @@ def about():
         password = os.getenv('password')
         mail = os.getenv('mails')
 
-        with smtplib.SMTP("smtp.gmail.com", 587) as connection:
+        with smtplib.SMTP("mail.johnmapunda.com", 587) as connection:
             connection.starttls()
             connection.login(user=my_email, password=password)
             connection.sendmail(
