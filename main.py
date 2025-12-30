@@ -13,6 +13,7 @@ from datetime import datetime
 from sqlalchemy import desc
 from dotenv import load_dotenv
 from supabase import create_client, Client
+import emails
 
 
 load_dotenv()
@@ -24,10 +25,12 @@ SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 DBPASSW = os.getenv('DBPASSW')
 
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 user=os.getenv('user')
-host='aws-0-us-east-1.pooler.supabase.com'
-port='6543'
-dbname='postgres'
+# host='127.0.0.1'
+# port='5432'
+# dbname='johnjkeq_movies'
 
 # print(requests.get(tmdb_url).json())
 
@@ -36,28 +39,28 @@ app.config['SECRET_KEY'] = os.getenv('app')
 Bootstrap(app)
 
 ##CREATE DATABASE
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{user}:{DBPASSW}@{host}:{port}/{dbname}"
+# app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{user}:{DBPASSW}@{host}:{port}/{dbname}"
 # app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///./movie-portfolio.db"
 # Optional: But it will silence the deprecation warning in the console.
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# db = SQLAlchemy(app)
 
 
 ##CREATE TABLE
-class Movie(db.Model):
-    # __tablename__ = 'movie'
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(9000), unique=True, nullable=False)
-    year = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(9000), unique=True, nullable=False)
-    rating = db.Column(db.Float, nullable=False)
-    ranking = db.Column(db.Integer, nullable=True)
-    vote = db.Column(db.Integer, nullable=True)
-    img_url = db.Column(db.String(9000), unique=True, nullable=False)
-
-    # Optional: this will allow each book object to be identified by its title when printed.
-    def __repr__(self):
-        return self.title
+# class Movie(db.Model):
+#     # __tablename__ = 'movie'
+#     id = db.Column(db.Integer, primary_key=True)
+#     title = db.Column(db.String(9000), unique=True, nullable=False)
+#     year = db.Column(db.Integer, nullable=False)
+#     description = db.Column(db.String(9000), unique=True, nullable=False)
+#     rating = db.Column(db.Float, nullable=False)
+#     ranking = db.Column(db.Integer, nullable=True)
+#     vote = db.Column(db.Integer, nullable=True)
+#     img_url = db.Column(db.String(9000), unique=True, nullable=False)
+#
+#     # Optional: this will allow each book object to be identified by its title when printed.
+#     def __repr__(self):
+#         return self.title
         # return f"<Movie (title='{self.title}', year={self.year}, description='{self.description}', rating={self.rating}, img_url='{self.img_url}')>"
 
 class AboutForm(FlaskForm):
@@ -76,44 +79,58 @@ class AddMovie(FlaskForm):
     # img_url = URLField('Image Url', validators=[DataRequired()])
     submit = SubmitField('Search')
 
+@app.context_processor
+def inject_current_year():
+    return {'current_year': datetime.now().year}
 
 @app.route("/")
 def home():
-    all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
-                                  Movie.vote, Movie.img_url).order_by(desc(Movie.ranking)).all()
+    # all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
+    #                               Movie.vote, Movie.img_url).order_by(desc(Movie.ranking)).all()
+    all_movies = (supabase.table('movie_collection').select('*').order('ranking', desc=True).execute()).data
     return render_template("index.html", all_movies=all_movies)
 
 
 @app.route("/about", methods=['GET', 'POST'])
 def about():
-    all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
-                                  Movie.vote, Movie.img_url).order_by(desc(Movie.rating)).all()
+    # all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
+    #                               Movie.vote, Movie.img_url).order_by(desc(Movie.rating)).all()
     aboutform = AboutForm()
     if aboutform.validate_on_submit():
         name = aboutform.name.data
         email = aboutform.email.data
         message = aboutform.message.data
-        my_email = os.getenv('my_email')
+        my_email = 'admin@johnmapunda.com'
         password = os.getenv('password')
-        mail = os.getenv('mails')
+        APPLE_MAIL = os.getenv('APPLE_MAIL')
+        APPLE_USER_ID = os.getenv('APPLE_USER_ID')
+        mail = 'admin@johnmapunda.com'
 
-        with smtplib.SMTP("mail.johnmapunda.com", 587) as connection:
-            connection.starttls()
-            connection.login(user=my_email, password=password)
-            connection.sendmail(
-                from_addr=my_email,
-                to_addrs=mail,
-                msg=f"Subject:{email}\n\nHello i am {name} \nMessage:{message}\n{email}."
-                )
+        message = emails.Message(
+            subject="Website Message",
+            text=f"Hello,\n\nI am {name} \nMessage: {message}\n{email}.",
+            mail_from=("John Mapunda(Movie)", "admin@johnmapunda.com")
+            )
+
+        response = message.send(to="admin@johnmapunda.com", smtp={
+            "host": "smtp.mail.me.com",
+            "port": 587,
+            "user": APPLE_USER_ID,
+            "password": APPLE_MAIL,
+            "tls": True
+            })
+        if response.status_code == 250:
+            print("Email sent successfully!")
+        else:
+            print(f"Failed to send email: {response}")
 
         return redirect(url_for('home'))
 
-    return render_template("about.html", aboutform=aboutform, all_movies=all_movies)
+    return render_template("about.html", aboutform=aboutform,) #all_movies=all_movies)
 
 @app.route("/allmovie")
 def allmovie():
-    all_movies = db.session.query(Movie.id, Movie.title, Movie.year, Movie.description, Movie.rating, Movie.ranking,
-                                  Movie.vote, Movie.img_url).order_by(desc(Movie.rating)).all()
+    all_movies = (supabase.table('movie_collection').select('*').order('rating', desc=True).execute()).data
     return render_template("allmovie.html", all_movies=all_movies)
 
 
@@ -131,51 +148,57 @@ def allmovie():
 
 @app.route("/delete/<int:movie_id>",)
 def delete(movie_id):
-    movie_to_delete = Movie.query.get(movie_id)
-    if movie_to_delete:
-        db.session.delete(movie_to_delete)
-        db.session.commit()
+    supabase.table('movie_collection').delete().eq(column= 'id', value=movie_id).execute()
 
     return redirect(url_for('home'))
 
 @app.route("/vote/<int:movie_id>",)
 def vote(movie_id):
-    movie_to_vote = Movie.query.get(movie_id)
-    if movie_to_vote:
-        movie_to_vote.ranking += 1
-        db.session.commit()
+    ranking_movie = supabase.table('movie_collection').select().eq(column='id', value=movie_id).execute()
+    (supabase.table('movie_collection').update({'ranking': ranking_movie.data[0]['ranking'] + 1})
+     .eq(column='id', value=movie_id).execute())
+    # movie_to_vote = Movie.query.get(movie_id)
+    # if movie_to_vote:
+    #     movie_to_vote.ranking += 1
+    #     db.session.commit()
 
     return redirect(url_for('home'))
 
+
 movie_results = []
+
+
 @app.route('/add/<int:id_movie>', methods=['GET'])
 def selected_movie(id_movie):
-
     for movie in movie_results:
         if movie['id'] == id_movie:
+            print(movie)
             with app.app_context():
                 try:
-                    db.create_all()
-                    movie_added = Movie(
-                        id = movie['id'],
-                        title = movie['movie_title'],
-                        year=datetime.strptime(movie['movie_release_date'], "%Y-%m-%d").year,
-                        # year = movie['movie_release_date'],
-                        description = movie['movie_description'],
-                        rating = movie['movie_rating'],
-                        ranking=movie.get('movie_ranking', 0),  # Default ranking
-                        vote=movie.get('movie_vote'),
-                        img_url = f"{image_poster}{movie['movie_img_url']}".replace('//', '/')
-                        )
-                    db.session.add(movie_added)
-                    db.session.commit()
-                    print(f' movie added is: {movie_added}')
+                    print(1)
+                    id = movie['id']
+                    title = movie['movie_title']
+                    # year = int(datetime.strptime(movie['movie_release_date'], "%Y-%m-%d").year)
+                    year = movie['movie_release_date'],
+                    description = movie['movie_description']
+                    rating = movie['movie_rating']
+                    ranking = movie.get('movie_ranking', 0)  # Default ranking
+                    vote = movie.get('movie_vote')
+                    img_url = f"{image_poster}{movie['movie_img_url']}".replace('//', '/')
+                    supabase.table('movie_collection').insert({
+                        'id': id,
+                        'title': title,
+                        'year': year,
+                        'description': description,
+                        'rating': rating,
+                        'ranking': ranking,
+                        'img_url': img_url
+                        }).execute()
+
+                    print(f' movie added is: {title}')
                 except Exception as e:
-                    db.session.rollback()  # Roll back if there's any error
-                    print("Failed 1 to add the movie:", e)
-
-
-            # print(f' movie added is: {movie_added}')
+                    # db.session.rollback()  # Roll back if there's any error
+                    print("Failed to add the movie:", e)
 
     return redirect(url_for('home'))
 
@@ -206,8 +229,8 @@ def add():
             movie_results.append(movie_data)
             # movie_results.append(f'{movie_title} - {movie_release_date}')
 
-
     return render_template("add.html", form=add_form, movie_results=movie_results)
+
 
 # with app.app_context():
 #     try:
